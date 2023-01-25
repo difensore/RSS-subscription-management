@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Models;
 
-public partial class RssSubscriptionManagementContext : DbContext
+public partial class RssSubscriptionManagementContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     public RssSubscriptionManagementContext()
     {
@@ -19,12 +21,14 @@ public partial class RssSubscriptionManagementContext : DbContext
 
     public virtual DbSet<Item> Items { get; set; }
 
-    public virtual DbSet<Rssfeed> Rssfeeds { get; set; }  
+    public virtual DbSet<Rssfeed> Rssfeeds { get; set; }
 
+    public virtual DbSet<WatchedRss> WatchedRsss { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FeedItem>(entity =>
         {
+            base.OnModelCreating(modelBuilder);
             entity.ToTable("FeedItem");
 
             entity.Property(e => e.FeedId).HasMaxLength(450);
@@ -39,6 +43,20 @@ public partial class RssSubscriptionManagementContext : DbContext
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_FeedItem_Item");
+        });
+        modelBuilder.Entity<WatchedRss>(entity =>
+        {
+            base.OnModelCreating(modelBuilder);
+            entity.ToTable("WatchedRss");
+
+            entity.Property(e => e.FeedId).HasMaxLength(450);
+            entity.Property(e => e.UserId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Feed).WithMany(p => p.WatchedRsss)
+                .HasForeignKey(d => d.FeedId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_WatchedRss_RSSFeed");
+           
         });
 
         modelBuilder.Entity<Item>(entity =>
