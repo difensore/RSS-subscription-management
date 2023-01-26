@@ -23,7 +23,7 @@ namespace RssSubscriptionManagement.Services
             }
             return some;
         }      
-        public async Task<List<Item>> GetAllItemsbyDate(DateOnly date)
+        public async Task<List<Item>> GetAllItemsbyDate(DateTime date)
         {
             var allItems =db.Items;
             var items = await db.WatchedRsss.Join(allItems, p => p.ItemId, c => c.Id, (p, c) => c).ToListAsync();

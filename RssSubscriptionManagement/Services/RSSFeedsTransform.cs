@@ -55,16 +55,14 @@ namespace RssSubscriptionManagement.Services
                     return sw.ToString();              
         }
         private AtomEntry ToRssItem(Item post)
-        {
-            DateOnly dateOnly = (DateOnly)post.Date;            
-            DateTime DateTime = dateOnly.ToDateTime(TimeOnly.Parse("12:00 PM"));
+        {            
             var item = new AtomEntry
             {
                 Title = post.Title,
                 Description = post.Description,
                 Id = post.Link,
-                Published =DateTime,
-                LastUpdated = DateTime,
+                Published =post.Date,
+                LastUpdated = post.Date,
                 ContentType = "html",
             };
 
