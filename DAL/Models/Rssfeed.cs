@@ -13,6 +13,5 @@ public partial class Rssfeed
 
     public string? Title { get; set; }
 
-    public virtual ICollection<FeedItem> FeedItems { get; } = new List<FeedItem>();
-    public virtual ICollection<WatchedRss> WatchedRsss { get; } = new List<WatchedRss>();
+    public virtual ICollection<FeedItem> FeedItems { get; } = new List<FeedItem>();    
 }

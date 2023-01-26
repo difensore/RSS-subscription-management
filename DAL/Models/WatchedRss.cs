@@ -11,11 +11,11 @@ namespace DAL.Models
     {
         public string Id { get; set; } = null!;
 
-        public string FeedId { get; set; } = null!;
+        public string ItemId { get; set; } = null!;
 
         public string UserId { get; set; } = null!;
 
-        public virtual Rssfeed Feed { get; set; } = null!;
+        public virtual Item Item { get; set; } = null!;
 
         public virtual IdentityUser User { get; set; } = null!;
     }

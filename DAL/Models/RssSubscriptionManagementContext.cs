@@ -49,11 +49,11 @@ public partial class RssSubscriptionManagementContext : IdentityDbContext<Identi
             base.OnModelCreating(modelBuilder);
             entity.ToTable("WatchedRss");
 
-            entity.Property(e => e.FeedId).HasMaxLength(450);
+            entity.Property(e => e.ItemId).HasMaxLength(450);
             entity.Property(e => e.UserId).HasMaxLength(450);
 
-            entity.HasOne(d => d.Feed).WithMany(p => p.WatchedRsss)
-                .HasForeignKey(d => d.FeedId)
+            entity.HasOne(d => d.Item).WithMany(p => p.WatchedRsss)
+                .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_WatchedRss_RSSFeed");
            

@@ -15,7 +15,8 @@ public partial class Item
 
     public string? Author { get; set; }
 
-    public DateTime? Date { get; set; }
+    public DateOnly? Date { get; set; }
 
     public virtual ICollection<FeedItem> FeedItems { get; } = new List<FeedItem>();
+    public virtual ICollection<WatchedRss> WatchedRsss { get; } = new List<WatchedRss>();
 }
