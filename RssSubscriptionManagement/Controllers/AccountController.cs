@@ -16,12 +16,8 @@ namespace RssSubscriptionManagement.Controllers
             _signInManager = signInManager;
             _identityprovider = identityProvider;
         }
+       
         [HttpGet, Route("register")]
-        public async Task<IActionResult> Test()
-        {
-            return Content("Test");
-        }
-        [HttpPost, Route("register")]
         public async Task<IActionResult> Register(string Email, string Password)
         {
             if (ModelState.IsValid)
@@ -43,13 +39,13 @@ namespace RssSubscriptionManagement.Controllers
             }
             return Content("SomeError");
         }
-        [HttpPost, Route("login")]
+        [HttpGet, Route("login")]
         public async Task<IActionResult> Login(string Email, string Password)
         {
             if (ModelState.IsValid)
             {
                 var result =
-                    await _signInManager.PasswordSignInAsync(Email, Password, false, false);
+                    await _signInManager.PasswordSignInAsync(Email, Password, true, false);
                 if (result.Succeeded)
                 {
                     return Content("Done");

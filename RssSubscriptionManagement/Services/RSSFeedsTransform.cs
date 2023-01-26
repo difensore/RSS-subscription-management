@@ -17,27 +17,28 @@ namespace RssSubscriptionManagement.Services
         }
         public async Task<string> GetFeeds()
         {
-            string result=null;
+            string result = null;
             var dict = _dp.GetFeed();
-            
+
             StringWriter sw = new StringWriter();
-            
-                using (XmlWriter xmlWriter = XmlWriter.Create(
-                        sw, new XmlWriterSettings()
-                        {
-                            Async = true,
-                            Indent = true
-                        }))
+
+            using (XmlWriter xmlWriter = XmlWriter.Create(
+                    sw, new XmlWriterSettings()
+                    {
+                        Async = true,
+                        Indent = true
+                    }))
+
+            {
                 foreach (var element in dict)
                 {
-                    {
-                    var rss = new RssFeedWriter(xmlWriter);
+                    var rss = new RssFeedWriter(xmlWriter);                          
                     await rss.WriteTitle(element.Key.Title);
-                    await rss.WriteDescription(element.Key.Description);                    
+                    await rss.WriteDescription(element.Key.Description);
                     await rss.WriteValue("link", element.Key.Link);
 
                     if (element.Value != null && element.Value.Count() > 0)
-                    {                        
+                    {
                         var feedItems = new List<AtomEntry>();
                         foreach (var post in element.Value)
                         {
@@ -49,11 +50,47 @@ namespace RssSubscriptionManagement.Services
                         {
                             await rss.Write(feedItem);
                         }
-                        }
                     }
                 }
-                    return sw.ToString();              
+            }
+            return sw.ToString();
         }
+        public async Task<string> GetFeedsUnread(DateTime date,string User)
+        {
+            var items = _dp.GetAllItemsbyDate(date, User).Result;
+            StringWriter sw = new StringWriter();
+            using (XmlWriter xmlWriter = XmlWriter.Create(
+                    sw, new XmlWriterSettings()
+                    {
+                        Async = true,
+                        Indent = true
+                    }))
+
+            {                
+                    var rss = new RssFeedWriter(xmlWriter);
+                    await rss.WriteTitle("Unread");
+                    await rss.WriteDescription($"Unread news by {date}");
+                    await rss.WriteValue("link", "https://github.com/difensore");
+
+                    if (items != null && items.Count() > 0)
+                    {
+                        var feedItems = new List<AtomEntry>();
+                        foreach (var post in items)
+                        {
+                            var item = ToRssItem(post);
+                            feedItems.Add(item);
+                        }
+
+                        foreach (var feedItem in feedItems)
+                        {
+                            await rss.Write(feedItem);
+                        }
+                    }
+                
+            }
+            return sw.ToString();
+        }
+
         private AtomEntry ToRssItem(Item post)
         {            
             var item = new AtomEntry

@@ -23,12 +23,14 @@ namespace RssSubscriptionManagement.Services
             }
             return some;
         }      
-        public async Task<List<Item>> GetAllItemsbyDate(DateTime date)
+        public async Task<List<Item>> GetAllItemsbyDate(DateTime date, string User)
         {
             var allItems =db.Items;
-            var items = await db.WatchedRsss.Join(allItems, p => p.ItemId, c => c.Id, (p, c) => c).ToListAsync();
-            var itemsbyDate = items.Where(p => p.Date == date);
-            return items;
+            var Watched = db.WatchedRsss.Where(p=>p.UserId==User);            
+            var WatchedItems = Watched.Join(allItems, p => p.ItemId, c => c.Id, (p, c) => c);
+            var unwatched=allItems.Except(WatchedItems);
+            var UnwatchedbyDate =await unwatched.Where(p => p.Date == date).ToListAsync();
+            return UnwatchedbyDate;
         }
     }
 }
