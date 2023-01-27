@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RssSubscriptionManagement.Interfaces;
 using RssSubscriptionManagement.Services;
@@ -56,6 +57,13 @@ namespace RssSubscriptionManagement.Controllers
                 }
             }
             return Content("Error");
+        }
+        [Authorize]
+        [HttpGet, Route("logout")]
+        public async Task<IActionResult> LogOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+            return Content("Logouted");
         }
     }
 }
