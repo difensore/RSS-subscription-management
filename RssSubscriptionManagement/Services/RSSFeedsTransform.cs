@@ -4,6 +4,7 @@ using Microsoft.SyndicationFeed;
 using Microsoft.SyndicationFeed.Atom;
 using Microsoft.SyndicationFeed.Rss;
 using RssSubscriptionManagement.Interfaces;
+using System;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using SyndicationLink = Microsoft.SyndicationFeed.SyndicationLink;
@@ -123,14 +124,15 @@ namespace RssSubscriptionManagement.Services
 
         private AtomEntry ToRssItem(Item post)
         {
+            TimeSpan offset = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time").GetUtcOffset(post.Date);
             var item = new AtomEntry
             {
                 Title = post.Title,
                 Description = post.Description,
                 Id = post.Link,
-                Published = post.Date,
+                Published = new DateTimeOffset(post.Date, offset),
                 LastUpdated = post.Date,
-                ContentType = "html",
+                ContentType = "html"
             };
 
             /* if (!string.IsNullOrEmpty(post.Category))

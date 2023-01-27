@@ -17,7 +17,7 @@ namespace RssSubscriptionManagement.Controllers
             _identityprovider = identityProvider;
         }
        
-        [HttpGet, Route("register")]
+        [HttpPost, Route("register")]
         public async Task<IActionResult> Register(string Email, string Password)
         {
             if (ModelState.IsValid)
