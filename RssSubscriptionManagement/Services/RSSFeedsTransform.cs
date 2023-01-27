@@ -4,7 +4,10 @@ using Microsoft.SyndicationFeed;
 using Microsoft.SyndicationFeed.Atom;
 using Microsoft.SyndicationFeed.Rss;
 using RssSubscriptionManagement.Interfaces;
+using System.ServiceModel.Syndication;
 using System.Xml;
+using SyndicationLink = Microsoft.SyndicationFeed.SyndicationLink;
+using SyndicationPerson = Microsoft.SyndicationFeed.SyndicationPerson;
 
 namespace RssSubscriptionManagement.Services
 {
@@ -14,47 +17,7 @@ namespace RssSubscriptionManagement.Services
         public RSSFeedsTransform(IDataProvider dp)
         {
             _dp=dp;
-        }
-        public async Task<string> GetFeeds()
-        {
-            string result = null;
-            var dict = _dp.GetFeed();
-
-            StringWriter sw = new StringWriter();
-
-            using (XmlWriter xmlWriter = XmlWriter.Create(
-                    sw, new XmlWriterSettings()
-                    {
-                        Async = true,
-                        Indent = true
-                    }))
-
-            {
-                foreach (var element in dict)
-                {
-                    var rss = new RssFeedWriter(xmlWriter);                          
-                    await rss.WriteTitle(element.Key.Title);
-                    await rss.WriteDescription(element.Key.Description);
-                    await rss.WriteValue("link", element.Key.Link);
-
-                    if (element.Value != null && element.Value.Count() > 0)
-                    {
-                        var feedItems = new List<AtomEntry>();
-                        foreach (var post in element.Value)
-                        {
-                            var item = ToRssItem(post);
-                            feedItems.Add(item);
-                        }
-
-                        foreach (var feedItem in feedItems)
-                        {
-                            await rss.Write(feedItem);
-                        }
-                    }
-                }
-            }
-            return sw.ToString();
-        }
+        }        
         public async Task<string> GetFeedsUnread(DateTime date,string User)
         {
             var items = _dp.GetAllItemsbyDate(date, User).Result;
@@ -89,6 +52,39 @@ namespace RssSubscriptionManagement.Services
                 
             }
             return sw.ToString();
+        }
+        public async Task<string> AddFeedtoDB(string url)
+        {      
+            Dictionary<Rssfeed,List<Item>> result=new Dictionary<Rssfeed,List<Item>>();
+            using var reader = XmlReader.Create(url);
+            var feed = SyndicationFeed.Load(reader);
+            var posts = feed.Items;
+            List<Item> items=new List<Item>();
+            foreach(var post in posts)
+            {
+                string author;
+                try
+                {
+                     author = post.Authors.First().Name;
+                }
+                catch
+                {
+                    author = null;
+                }
+                Item item = new Item() { Id = Guid.NewGuid().ToString(), Title = post.Title.Text, Description = post.Summary.Text, Author =  author, Link = post.Links.First().Uri.ToString(), Date = post.PublishDate.Date };
+                items.Add(item);
+            }
+            Rssfeed rssfeed = new Rssfeed() { Id = Guid.NewGuid().ToString(), Title = feed.Title.Text, Description = feed.Description.Text, Link = feed.Links.First().Uri.ToString() };
+            result.Add(rssfeed,items);
+           var answer=await _dp.AddFeed(result);
+            if (answer != null)
+            {
+                return answer;
+            }
+            else
+            {
+                return "Something go wrong";
+            }
         }
 
         private AtomEntry ToRssItem(Item post)

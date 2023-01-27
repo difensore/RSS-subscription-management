@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using RssSubscriptionManagement.Interfaces;
+using System.Collections.Generic;
 
 namespace RssSubscriptionManagement.Services
 {
@@ -11,17 +12,10 @@ namespace RssSubscriptionManagement.Services
         {
             db = context;
         }
-        public Dictionary<Rssfeed, List<Item>> GetFeed()
+        public async Task<List<Item>> GetItems()
         {
-            Dictionary<Rssfeed, List<Item>> some = new Dictionary<Rssfeed, List<Item>>();
-            var Feeds = db.Rssfeeds;
-            foreach (var Feed in Feeds)
-            {
-                var itemfeeds = db.FeedItems.Where(p => p.FeedId == Feed.Id);
-                var items = db.Items.Join(itemfeeds, p => p.Id, c => c.ItemId, (p, c) => p).ToList();
-                some.Add(Feed, items);
-            }
-            return some;
+           var items= await db.Items.ToListAsync();
+            return items;
         }
         public async Task<List<Item>> GetAllItemsbyDate(DateTime date, string User)
         {
@@ -56,6 +50,38 @@ namespace RssSubscriptionManagement.Services
                 return "Oops,some error";
             }
             
+        }
+        public async Task<string> AddFeed(Dictionary<Rssfeed,List<Item>> feeds)
+        {
+            try
+            {
+                List<FeedItem> items = new List<FeedItem>();
+                var feed = feeds.First();
+                db.Rssfeeds.Add(feed.Key);
+                await db.AddRangeAsync(feed.Value);
+                foreach (var item in feed.Value)
+                {
+                    FeedItem fi = new FeedItem() { Id = Guid.NewGuid().ToString(), FeedId = feed.Key.Id, ItemId = item.Id };
+                    items.Add(fi);
+                }
+                await db.FeedItems.AddRangeAsync(items);
+                db.SaveChanges();
+                return "Done";
+            }
+            catch
+            {
+                return null;
+            }           
+        }
+        public string GetFeeds()
+        {
+            string result=null;
+            var feeds = db.Rssfeeds;
+            foreach (var item in feeds)
+            {
+                result += item.Title + "\n";
+            }
+            return result;
         }
     }
 }

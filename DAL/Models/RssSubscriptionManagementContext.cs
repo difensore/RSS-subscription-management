@@ -65,8 +65,8 @@ public partial class RssSubscriptionManagementContext : IdentityDbContext<Identi
 
             entity.Property(e => e.Author).HasMaxLength(100);
             entity.Property(e => e.Date).HasColumnType("date");
-            entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Link).HasMaxLength(50);
+            entity.Property(e => e.Description);
+            entity.Property(e => e.Link).HasMaxLength(200);
             entity.Property(e => e.Title).HasMaxLength(50);
         });
 
@@ -74,8 +74,8 @@ public partial class RssSubscriptionManagementContext : IdentityDbContext<Identi
         {
             entity.ToTable("RSSFeed");
 
-            entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Link).HasMaxLength(50);
+            entity.Property(e => e.Description);
+            entity.Property(e => e.Link).HasMaxLength(200);
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsFixedLength();

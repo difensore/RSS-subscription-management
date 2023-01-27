@@ -16,15 +16,15 @@ namespace RssSubscriptionManagement.Controllers
             _convertor = converotr;
             _dp = dp;
         }
-        [HttpGet, Route("rss")]
-        public async Task<IActionResult> Rss()
-        {
-            string host = Request.Scheme + "://" + Request.Host;
-            string contentType = "application/xml";
+        /*  [HttpGet, Route("rss")]
+          public async Task<IActionResult> Rss()
+          {
+              string host = Request.Scheme + "://" + Request.Host;
+              string contentType = "application/xml";
 
-            var content = await _convertor.GetFeeds();
-            return Content(content, contentType);
-        }
+              var content = await _convertor.GetFeeds();
+              return Content(content, contentType);
+          }*/
 
         [HttpGet, Route("rssbydate")]
         public async Task<IActionResult> RssbyDate(string date)
@@ -46,6 +46,18 @@ namespace RssSubscriptionManagement.Controllers
         {
             var result =await _dp.SetitemAsRead(url, User.FindFirstValue(ClaimTypes.NameIdentifier));
             return Content(result);
+        }
+        [HttpPost, Route("newrss")]
+        public async Task<IActionResult> Getrss(string url)
+        {
+            var result = await _convertor.AddFeedtoDB(url);
+            return Content(result);
+        }
+
+        [HttpGet, Route("allfeeds")]
+        public IActionResult GetFeeds()
+        {            
+            return Content(_dp.GetFeeds());
         }
     }
 }
