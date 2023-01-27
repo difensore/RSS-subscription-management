@@ -7,4 +7,4 @@ Use this endpoints for:
 /RSSFeeds/rssbydate (parameter "date" (DD/MM/YYYY)) to get unread news by date  
 /RSSFeeds/rssmark (POST, parameter "url" to news) to set news as readed  
 /RSSFeeds/newrss (POST, parametr "url" to Rss feed) to save Rss Feed to database  
-/RSSFeeds/allfeeds to get Rss feeds names
+/RSSFeeds/allfeeds to get Rss feeds titles
