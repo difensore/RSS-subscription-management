@@ -16,15 +16,15 @@ namespace RssSubscriptionManagement.Controllers
             _convertor = converotr;
             _dp = dp;
         }
-        /*  [HttpGet, Route("rss")]
+          [HttpGet, Route("allnews")]
           public async Task<IActionResult> Rss()
           {
               string host = Request.Scheme + "://" + Request.Host;
               string contentType = "application/xml";
 
-              var content = await _convertor.GetFeeds();
+              var content = await _convertor.GetAllItems();
               return Content(content, contentType);
-          }*/
+          }
 
         [HttpGet, Route("rssbydate")]
         public async Task<IActionResult> RssbyDate(string date)
