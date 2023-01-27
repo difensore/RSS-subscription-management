@@ -161,9 +161,16 @@ namespace RssSubscriptionManagement.Services
                 LastUpdated = post.Date,
                 ContentType = "html"
             };
-            item.AddContributor(
-                new SyndicationPerson(post.Author, post.Author));
-
+            try
+            {
+                item.AddContributor(
+                    new SyndicationPerson(post.Author, post.Author));
+            }
+            catch
+            {
+                item.AddContributor(
+                    new SyndicationPerson("Unknown", "Unknown"));
+            }
             item.AddLink(
                 new SyndicationLink(new Uri(item.Id)));
 
