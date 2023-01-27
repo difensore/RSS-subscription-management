@@ -97,6 +97,8 @@ namespace RssSubscriptionManagement.Services
             List<Item> items = new List<Item>();
             foreach (var post in posts)
             {
+                string Summary;
+                string link;
                 string author;
                 try
                 {
@@ -106,10 +108,35 @@ namespace RssSubscriptionManagement.Services
                 {
                     author = "Unknown";
                 }
-                Item item = new Item() { Id = Guid.NewGuid().ToString(), Title = post.Title.Text, Description = post.Summary.Text, Author = author, Link = post.Links.First().Uri.ToString(), Date = post.PublishDate.Date };
+                try
+                {
+                    link = post.Links.First().Uri.ToString();
+                }
+                catch
+                {
+                    link = "No link";
+                }
+                try
+                {
+                    Summary = post.Summary.Text;
+                }
+                catch
+                {
+                    Summary = null;
+                }
+                Item item = new Item() { Id = Guid.NewGuid().ToString(), Title = post.Title.Text, Description =Summary, Author = author, Link = link, Date = post.PublishDate.Date };
                 items.Add(item);
             }
-            Rssfeed rssfeed = new Rssfeed() { Id = Guid.NewGuid().ToString(), Title = feed.Title.Text, Description = feed.Description.Text, Link = feed.Links.First().Uri.ToString() };
+            string linkfeed;
+            try
+            {
+                linkfeed = feed.Links.First().Uri.ToString();
+            }
+            catch
+            {
+                linkfeed = "No link";
+            }
+            Rssfeed rssfeed = new Rssfeed() { Id = Guid.NewGuid().ToString(), Title = feed.Title.Text, Description = feed.Description.Text, Link =linkfeed};
             result.Add(rssfeed, items);
             var answer = await _dp.AddFeed(result);
             if (answer != null)
@@ -134,13 +161,6 @@ namespace RssSubscriptionManagement.Services
                 LastUpdated = post.Date,
                 ContentType = "html"
             };
-
-            /* if (!string.IsNullOrEmpty(post.Category))
-             {
-                 item.AddCategory(
-                     new SyndicationCategory(post.Category));
-             }*/
-
             item.AddContributor(
                 new SyndicationPerson(post.Author, post.Author));
 
