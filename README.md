@@ -1,6 +1,6 @@
 # RSS-subscription-management  
 Use this endpoints for:  
-/Account/register (POST, parameters "Email" and "Password") to sign up  
+/Account/register (POST, parameters "Email" and "Password", password must contain at least 1 capital letter, 1 number and 1 special symbol) to sign up  
 /Account/login (parameters "Email" and "Password") to sign in  
 /Account/logout to logout  
 /RSSFeeds/allnews to get all news  
